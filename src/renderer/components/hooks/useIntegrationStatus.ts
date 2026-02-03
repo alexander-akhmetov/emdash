@@ -19,6 +19,9 @@ interface IntegrationStatus {
     email: string;
     token: string;
   }) => Promise<void>;
+
+  // Local ticket CLI
+  isTicketConnected: boolean | null;
 }
 
 /**
@@ -28,6 +31,7 @@ interface IntegrationStatus {
 export function useIntegrationStatus(isOpen: boolean): IntegrationStatus {
   const [isLinearConnected, setIsLinearConnected] = useState<boolean | null>(null);
   const [isJiraConnected, setIsJiraConnected] = useState<boolean | null>(null);
+  const [isTicketConnected, setIsTicketConnected] = useState<boolean | null>(null);
 
   const {
     installed: githubInstalled,
@@ -76,6 +80,28 @@ export function useIntegrationStatus(isOpen: boolean): IntegrationStatus {
       })
       .catch(() => {
         if (!cancel) setIsJiraConnected(false);
+      });
+    return () => {
+      cancel = true;
+    };
+  }, [isOpen]);
+
+  // Check local ticket CLI connection
+  useEffect(() => {
+    if (!isOpen) return;
+    let cancel = false;
+    const api = window.electronAPI as any;
+    if (!api?.ticketCheckConnection) {
+      setIsTicketConnected(false);
+      return;
+    }
+    api
+      .ticketCheckConnection()
+      .then((res: any) => {
+        if (!cancel) setIsTicketConnected(!!res?.connected);
+      })
+      .catch(() => {
+        if (!cancel) setIsTicketConnected(false);
       });
     return () => {
       cancel = true;
@@ -133,5 +159,6 @@ export function useIntegrationStatus(isOpen: boolean): IntegrationStatus {
     handleGithubConnect,
     isJiraConnected,
     handleJiraConnect,
+    isTicketConnected,
   };
 }

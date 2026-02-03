@@ -10,12 +10,14 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from './
 import { LinearIssueSelector } from './LinearIssueSelector';
 import { GitHubIssueSelector } from './GitHubIssueSelector';
 import JiraIssueSelector from './JiraIssueSelector';
+import TicketIssueSelector from './TicketIssueSelector';
 import LinearSetupForm from './integrations/LinearSetupForm';
 import JiraSetupForm from './integrations/JiraSetupForm';
 import { type LinearIssueSummary } from '../types/linear';
 import { type GitHubIssueSummary } from '../types/github';
 import { type GitHubIssueLink } from '../types/chat';
 import { type JiraIssueSummary } from '../types/jira';
+import { type TicketIssueSummary } from '../types/ticket';
 
 interface TaskAdvancedSettingsProps {
   isOpen: boolean;
@@ -55,6 +57,11 @@ interface TaskAdvancedSettingsProps {
   onJiraIssueChange: (issue: JiraIssueSummary | null) => void;
   isJiraConnected: boolean | null;
   onJiraConnect: (credentials: { siteUrl: string; email: string; token: string }) => Promise<void>;
+
+  // Local ticket
+  selectedTicketIssue: TicketIssueSummary | null;
+  onTicketIssueChange: (issue: TicketIssueSummary | null) => void;
+  isTicketConnected: boolean | null;
 }
 
 export const TaskAdvancedSettings: React.FC<TaskAdvancedSettingsProps> = ({
@@ -83,6 +90,9 @@ export const TaskAdvancedSettings: React.FC<TaskAdvancedSettingsProps> = ({
   onJiraIssueChange,
   isJiraConnected,
   onJiraConnect,
+  selectedTicketIssue,
+  onTicketIssueChange,
+  isTicketConnected,
 }) => {
   const shouldReduceMotion = useReducedMotion();
   const [showAdvanced, setShowAdvanced] = useState(false);
@@ -138,9 +148,10 @@ export const TaskAdvancedSettings: React.FC<TaskAdvancedSettingsProps> = ({
       if (issue) {
         onGithubIssueChange(null);
         onJiraIssueChange(null);
+        onTicketIssueChange(null);
       }
     },
-    [onLinearIssueChange, onGithubIssueChange, onJiraIssueChange]
+    [onLinearIssueChange, onGithubIssueChange, onJiraIssueChange, onTicketIssueChange]
   );
 
   const handleGithubIssueChange = useCallback(
@@ -149,9 +160,10 @@ export const TaskAdvancedSettings: React.FC<TaskAdvancedSettingsProps> = ({
       if (issue) {
         onLinearIssueChange(null);
         onJiraIssueChange(null);
+        onTicketIssueChange(null);
       }
     },
-    [onGithubIssueChange, onLinearIssueChange, onJiraIssueChange]
+    [onGithubIssueChange, onLinearIssueChange, onJiraIssueChange, onTicketIssueChange]
   );
 
   const handleJiraIssueChange = useCallback(
@@ -160,9 +172,22 @@ export const TaskAdvancedSettings: React.FC<TaskAdvancedSettingsProps> = ({
       if (issue) {
         onLinearIssueChange(null);
         onGithubIssueChange(null);
+        onTicketIssueChange(null);
       }
     },
-    [onJiraIssueChange, onLinearIssueChange, onGithubIssueChange]
+    [onJiraIssueChange, onLinearIssueChange, onGithubIssueChange, onTicketIssueChange]
+  );
+
+  const handleTicketIssueChange = useCallback(
+    (issue: TicketIssueSummary | null) => {
+      onTicketIssueChange(issue);
+      if (issue) {
+        onLinearIssueChange(null);
+        onGithubIssueChange(null);
+        onJiraIssueChange(null);
+      }
+    },
+    [onTicketIssueChange, onLinearIssueChange, onGithubIssueChange, onJiraIssueChange]
   );
 
   const getInitialPromptPlaceholder = () => {
@@ -177,6 +202,9 @@ export const TaskAdvancedSettings: React.FC<TaskAdvancedSettingsProps> = ({
     }
     if (selectedJiraIssue) {
       return `e.g. Fix the attached Jira ticket ${selectedJiraIssue.key} — describe any constraints.`;
+    }
+    if (selectedTicketIssue) {
+      return `e.g. Fix the attached ticket ${selectedTicketIssue.id} — describe any constraints.`;
     }
     return 'e.g. Summarize the key problems and propose a plan.';
   };
@@ -292,7 +320,8 @@ export const TaskAdvancedSettings: React.FC<TaskAdvancedSettingsProps> = ({
                         !hasInitialPromptSupport ||
                         !isLinearConnected ||
                         !!selectedGithubIssue ||
-                        !!selectedJiraIssue
+                        !!selectedJiraIssue ||
+                        !!selectedTicketIssue
                       }
                       className="w-full"
                       autoOpen={autoOpenLinearSelector}
@@ -330,7 +359,8 @@ export const TaskAdvancedSettings: React.FC<TaskAdvancedSettingsProps> = ({
                         !hasInitialPromptSupport ||
                         !isGithubConnected ||
                         !!selectedJiraIssue ||
-                        !!selectedLinearIssue
+                        !!selectedLinearIssue ||
+                        !!selectedTicketIssue
                       }
                       className="w-full"
                       placeholder={isGithubConnected ? 'Select a GitHub issue' : 'Select issue'}
@@ -374,7 +404,8 @@ export const TaskAdvancedSettings: React.FC<TaskAdvancedSettingsProps> = ({
                         !hasInitialPromptSupport ||
                         !isJiraConnected ||
                         !!selectedLinearIssue ||
-                        !!selectedGithubIssue
+                        !!selectedGithubIssue ||
+                        !!selectedTicketIssue
                       }
                       className="w-full"
                       placeholder={isJiraConnected ? 'Select a Jira issue' : 'Select issue'}
@@ -391,6 +422,30 @@ export const TaskAdvancedSettings: React.FC<TaskAdvancedSettingsProps> = ({
                       Connect
                     </Button>
                   )}
+                </div>
+              </div>
+
+              <div className="grid grid-cols-[128px_1fr] items-start gap-4">
+                <Label htmlFor="ticket-issue" className="pt-2">
+                  Local ticket
+                </Label>
+                <div className="flex min-w-0 items-center gap-2">
+                  <div className="min-w-0 flex-1 overflow-hidden">
+                    <TicketIssueSelector
+                      selectedIssue={selectedTicketIssue}
+                      onIssueChange={handleTicketIssueChange}
+                      isOpen={isOpen}
+                      disabled={
+                        !hasInitialPromptSupport ||
+                        !isTicketConnected ||
+                        !!selectedLinearIssue ||
+                        !!selectedGithubIssue ||
+                        !!selectedJiraIssue
+                      }
+                      className="w-full"
+                      placeholder={isTicketConnected ? 'Select a local ticket' : 'CLI not found'}
+                    />
+                  </div>
                 </div>
               </div>
             </div>
