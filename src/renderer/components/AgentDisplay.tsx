@@ -1,10 +1,12 @@
 import React from 'react';
-import { ExternalLink, MessageSquare } from 'lucide-react';
+import { ExternalLink, MessageSquare, Ticket } from 'lucide-react';
 import { type Agent } from '../types';
 import { type LinearIssueSummary } from '../types/linear';
 import { type GitHubIssueSummary } from '../types/github';
 import { type JiraIssueSummary } from '../types/jira';
+import { type TicketIssueSummary } from '../types/ticket';
 import { TooltipProvider, Tooltip, TooltipTrigger, TooltipContent } from './ui/tooltip';
+import { TicketIssuePreviewTooltip } from './TicketIssuePreviewTooltip';
 import { CommentsPopover } from './CommentsPopover';
 import { Button } from './ui/button';
 import { useTaskComments } from '../hooks/useLineComments';
@@ -41,6 +43,7 @@ type Props = {
   linearIssue?: LinearIssueSummary | null;
   githubIssue?: GitHubIssueSummary | null;
   jiraIssue?: JiraIssueSummary | null;
+  ticketIssue?: TicketIssueSummary | null;
 };
 
 const agentConfig: Record<Agent, { name: string; logo: string }> = {
@@ -72,6 +75,7 @@ export const AgentDisplay: React.FC<Props> = ({
   linearIssue,
   githubIssue,
   jiraIssue,
+  ticketIssue,
 }) => {
   const config = agentConfig[agent] ?? { name: agent, logo: '' };
   const { taskId: scopedTaskId } = useTaskScope();
@@ -263,6 +267,19 @@ export const AgentDisplay: React.FC<Props> = ({
             </TooltipContent>
           </Tooltip>
         </TooltipProvider>
+      )}
+
+      {ticketIssue && (
+        <TicketIssuePreviewTooltip issue={ticketIssue}>
+          <button
+            type="button"
+            className="inline-flex h-7 items-center gap-1.5 rounded-md border border-border bg-muted px-2 text-xs font-medium text-foreground hover:bg-muted/80 dark:border-border dark:bg-muted dark:hover:bg-muted/80"
+            aria-label={`Local ticket ${ticketIssue.id}: ${ticketIssue.title || 'No title'}`}
+          >
+            <Ticket className="h-3.5 w-3.5 text-amber-600 dark:text-amber-400" />
+            <span>{ticketIssue.id}</span>
+          </button>
+        </TicketIssuePreviewTooltip>
       )}
 
       {resolvedTaskId && unsentCount > 0 && (

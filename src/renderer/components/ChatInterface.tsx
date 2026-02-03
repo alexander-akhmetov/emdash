@@ -710,6 +710,35 @@ const ChatInterface: React.FC<Props> = ({
       return jiraContent;
     }
 
+    const t = md?.ticketIssue as any;
+    if (t) {
+      const lines: string[] = [];
+      const l1 = `Linked ticket: ${t.id}${t.title ? ` — ${t.title}` : ''}`;
+      if (l1.trim()) lines.push(l1);
+      const details: string[] = [];
+      if (t.status) details.push(`Status: ${t.status}`);
+      if (t.priority) details.push(`Priority: ${t.priority}`);
+      if (t.assignee) details.push(`Assignee: ${t.assignee}`);
+      if (t.project?.name) details.push(`Project: ${t.project.name}`);
+      if (t.type) details.push(`Type: ${t.type}`);
+      if (details.length) lines.push(`Details: ${details.join(' • ')}`);
+      if (Array.isArray(t.deps) && t.deps.length > 0) {
+        lines.push(`Blocked by: ${t.deps.join(', ')}`);
+      }
+      if (Array.isArray(t.links) && t.links.length > 0) {
+        lines.push(`Links: ${t.links.join(', ')}`);
+      }
+      if (typeof t.description === 'string' && t.description.trim()) {
+        lines.push('', 'Ticket Description:', t.description.trim());
+      }
+      const ticketContent = lines.join('\n');
+      // Prepend comments if any
+      if (commentsContext) {
+        return `The user has left the following comments on the code changes:\n\n${commentsContext}\n\n${ticketContent}`;
+      }
+      return ticketContent;
+    }
+
     // If we have comments but no other context, return just the comments
     if (commentsContext) {
       return `The user has left the following comments on the code changes:\n\n${commentsContext}`;
@@ -839,13 +868,15 @@ const ChatInterface: React.FC<Props> = ({
 
                   {(task.metadata?.linearIssue ||
                     task.metadata?.githubIssue ||
-                    task.metadata?.jiraIssue) && (
+                    task.metadata?.jiraIssue ||
+                    task.metadata?.ticketIssue) && (
                     <AgentDisplay
                       agent={agent}
                       taskId={task.id}
                       linearIssue={task.metadata?.linearIssue || null}
                       githubIssue={task.metadata?.githubIssue || null}
                       jiraIssue={task.metadata?.jiraIssue || null}
+                      ticketIssue={task.metadata?.ticketIssue || null}
                     />
                   )}
                 </div>

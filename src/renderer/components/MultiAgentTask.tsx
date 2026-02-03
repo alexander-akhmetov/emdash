@@ -153,6 +153,30 @@ const MultiAgentTask: React.FC<Props> = ({ task }) => {
       if (j.url) lines.push(`URL: ${j.url}`);
       return lines.join('\n');
     }
+    // Ticket
+    const t = md?.ticketIssue as any;
+    if (t) {
+      const lines: string[] = [];
+      const l1 = `Linked ticket: ${t.id}${t.title ? ` — ${t.title}` : ''}`;
+      if (l1.trim()) lines.push(l1);
+      const details: string[] = [];
+      if (t.status) details.push(`Status: ${t.status}`);
+      if (t.priority) details.push(`Priority: ${t.priority}`);
+      if (t.assignee) details.push(`Assignee: ${t.assignee}`);
+      if (t.project?.name) details.push(`Project: ${t.project.name}`);
+      if (t.type) details.push(`Type: ${t.type}`);
+      if (details.length) lines.push(`Details: ${details.join(' • ')}`);
+      if (Array.isArray(t.deps) && t.deps.length > 0) {
+        lines.push(`Blocked by: ${t.deps.join(', ')}`);
+      }
+      if (Array.isArray(t.links) && t.links.length > 0) {
+        lines.push(`Links: ${t.links.join(', ')}`);
+      }
+      if (typeof t.description === 'string' && t.description.trim()) {
+        lines.push('', 'Ticket Description:', t.description.trim());
+      }
+      return lines.join('\n');
+    }
     return null;
   }, [task.metadata]);
 

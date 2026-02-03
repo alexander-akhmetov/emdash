@@ -1626,7 +1626,10 @@ const AppContent: React.FC = () => {
         // This runs after modal closes so user sees task immediately
         (async () => {
           const hasIssueContext =
-            taskMetadata?.linearIssue || taskMetadata?.githubIssue || taskMetadata?.jiraIssue;
+            taskMetadata?.linearIssue ||
+            taskMetadata?.githubIssue ||
+            taskMetadata?.jiraIssue ||
+            taskMetadata?.ticketIssue;
           let conversationId: string | undefined;
 
           if (hasIssueContext) {
@@ -1773,6 +1776,44 @@ const AppContent: React.FC = () => {
             } catch (seedError) {
               const { log } = await import('./lib/logger');
               log.error('Failed to seed task with Jira issue context:', seedError as any);
+            }
+          }
+
+          if (conversationId && taskMetadata?.ticketIssue) {
+            try {
+              const issue = taskMetadata.ticketIssue;
+              const lines: string[] = [];
+              const line1 = `Linked ticket: ${issue.id}${issue.title ? ` — ${issue.title}` : ''}`.trim();
+              if (line1) lines.push(line1);
+
+              const details: string[] = [];
+              if (issue.status) details.push(`Status: ${issue.status}`);
+              if (issue.priority) details.push(`Priority: ${issue.priority}`);
+              if (issue.assignee) details.push(`Assignee: ${issue.assignee}`);
+              if (issue.project?.name) details.push(`Project: ${issue.project.name}`);
+              if (issue.type) details.push(`Type: ${issue.type}`);
+              if (details.length) lines.push(`Details: ${details.join(' • ')}`);
+              if ((issue.deps?.length ?? 0) > 0) lines.push(`Blocked by: ${issue.deps?.join(', ')}`);
+              if ((issue.links?.length ?? 0) > 0) lines.push(`Links: ${issue.links?.join(', ')}`);
+              if (issue.description) {
+                lines.push('');
+                lines.push('Ticket Description:');
+                lines.push(String(issue.description).trim());
+              }
+
+              await window.electronAPI.saveMessage({
+                id: `ticket-context-${newTask.id}`,
+                conversationId,
+                content: lines.join('\n'),
+                sender: 'agent',
+                metadata: JSON.stringify({
+                  isTicketContext: true,
+                  ticketIssue: issue,
+                }),
+              });
+            } catch (seedError) {
+              const { log } = await import('./lib/logger');
+              log.error('Failed to seed task with ticket context:', seedError as any);
             }
           }
         })();
