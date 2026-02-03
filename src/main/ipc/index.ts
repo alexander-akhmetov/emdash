@@ -15,6 +15,7 @@ import { registerConnectionsIpc } from './connectionsIpc';
 import { registerUpdateIpc } from '../services/updateIpc';
 import { registerTelemetryIpc } from './telemetryIpc';
 import { registerJiraIpc } from './jiraIpc';
+import { registerTicketIpc } from './ticketIpc';
 import { registerPlanLockIpc } from '../services/planLockIpc';
 import { registerSettingsIpc } from './settingsIpc';
 import { registerHostPreviewIpc } from './hostPreviewIpc';
@@ -49,5 +50,6 @@ export function registerAllIpc() {
   registerLinearIpc();
   registerConnectionsIpc();
   registerJiraIpc();
+  registerTicketIpc();
   registerPlanLockIpc();
 }

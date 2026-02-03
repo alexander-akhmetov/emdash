@@ -328,6 +328,12 @@ contextBridge.exposeInMainWorld('electronAPI', {
   jiraInitialFetch: (limit?: number) => ipcRenderer.invoke('jira:initialFetch', limit),
   jiraSearchIssues: (searchTerm: string, limit?: number) =>
     ipcRenderer.invoke('jira:searchIssues', searchTerm, limit),
+  // Local ticket CLI integration
+  ticketCheckConnection: () => ipcRenderer.invoke('ticket:checkConnection'),
+  ticketInitialFetch: (limit?: number) => ipcRenderer.invoke('ticket:initialFetch', limit),
+  ticketSearchIssues: (searchTerm: string, limit?: number) =>
+    ipcRenderer.invoke('ticket:searchIssues', searchTerm, limit),
+  ticketGetDetails: (id: string) => ipcRenderer.invoke('ticket:getDetails', id),
   getProviderStatuses: (opts?: { refresh?: boolean; providers?: string[]; providerId?: string }) =>
     ipcRenderer.invoke('providers:getStatuses', opts ?? {}),
   // Database methods

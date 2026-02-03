@@ -16,6 +16,7 @@ import { type LinearIssueSummary } from '../types/linear';
 import { type GitHubIssueSummary } from '../types/github';
 import { type GitHubIssueLink } from '../types/chat';
 import { type JiraIssueSummary } from '../types/jira';
+import { type TicketIssueSummary } from '../types/ticket';
 import {
   generateFriendlyTaskName,
   normalizeTaskName,
@@ -35,6 +36,7 @@ interface TaskModalProps {
     linkedLinearIssue?: LinearIssueSummary | null,
     linkedGithubIssue?: GitHubIssueSummary | null,
     linkedJiraIssue?: JiraIssueSummary | null,
+    linkedTicketIssue?: TicketIssueSummary | null,
     autoApprove?: boolean,
     useWorktree?: boolean,
     baseRef?: string
@@ -72,6 +74,7 @@ const TaskModal: React.FC<TaskModalProps> = ({
   const [selectedLinearIssue, setSelectedLinearIssue] = useState<LinearIssueSummary | null>(null);
   const [selectedGithubIssue, setSelectedGithubIssue] = useState<GitHubIssueSummary | null>(null);
   const [selectedJiraIssue, setSelectedJiraIssue] = useState<JiraIssueSummary | null>(null);
+  const [selectedTicketIssue, setSelectedTicketIssue] = useState<TicketIssueSummary | null>(null);
   const [autoApprove, setAutoApprove] = useState(false);
   const [useWorktree, setUseWorktree] = useState(true);
 
@@ -130,6 +133,7 @@ const TaskModal: React.FC<TaskModalProps> = ({
       setSelectedLinearIssue(null);
       setSelectedGithubIssue(null);
       setSelectedJiraIssue(null);
+      setSelectedTicketIssue(null);
       setInitialPrompt('');
     }
   }, [hasInitialPromptSupport]);
@@ -153,6 +157,7 @@ const TaskModal: React.FC<TaskModalProps> = ({
     setSelectedLinearIssue(null);
     setSelectedGithubIssue(null);
     setSelectedJiraIssue(null);
+    setSelectedTicketIssue(null);
     setAutoApprove(false);
     setUseWorktree(true);
     userHasTypedRef.current = false;
@@ -239,6 +244,7 @@ const TaskModal: React.FC<TaskModalProps> = ({
         selectedLinearIssue,
         selectedGithubIssue,
         selectedJiraIssue,
+        selectedTicketIssue,
         hasAutoApproveSupport ? autoApprove : false,
         useWorktree,
         selectedBranch
@@ -329,6 +335,9 @@ const TaskModal: React.FC<TaskModalProps> = ({
             onJiraIssueChange={setSelectedJiraIssue}
             isJiraConnected={integrations.isJiraConnected}
             onJiraConnect={integrations.handleJiraConnect}
+            selectedTicketIssue={selectedTicketIssue}
+            onTicketIssueChange={setSelectedTicketIssue}
+            isTicketConnected={integrations.isTicketConnected}
           />
 
           <DialogFooter>

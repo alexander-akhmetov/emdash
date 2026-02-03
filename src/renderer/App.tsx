@@ -53,6 +53,7 @@ import { type GitHubIssueSummary } from './types/github';
 import { type GitHubIssueLink } from './types/chat';
 import { type JiraIssueSummary } from './types/jira';
 import { type LinearIssueSummary } from './types/linear';
+import { type TicketIssueSummary } from './types/ticket';
 
 const TERMINAL_PROVIDER_IDS = [
   'qwen',
@@ -1234,6 +1235,7 @@ const AppContent: React.FC = () => {
     linkedLinearIssue: LinearIssueSummary | null = null,
     linkedGithubIssue: GitHubIssueSummary | null = null,
     linkedJiraIssue: JiraIssueSummary | null = null,
+    linkedTicketIssue: TicketIssueSummary | null = null,
     autoApprove?: boolean,
     useWorktree: boolean = true,
     baseRef?: string
@@ -1256,15 +1258,25 @@ const AppContent: React.FC = () => {
           if (linkedGithubIssue.url) parts.push(`URL: ${linkedGithubIssue.url}`);
           parts.push('');
         }
+        if (linkedJiraIssue) {
+          parts.push(`Jira: ${linkedJiraIssue.key} — ${linkedJiraIssue.summary}`);
+          if (linkedJiraIssue.url) parts.push(`URL: ${linkedJiraIssue.url}`);
+          parts.push('');
+        }
+        if (linkedTicketIssue) {
+          parts.push(`Ticket: ${linkedTicketIssue.id} — ${linkedTicketIssue.title}`);
+          parts.push('');
+        }
         parts.push(initialPrompt.trim());
         preparedPrompt = parts.join('\n');
       }
       const taskMetadata: TaskMetadata | null =
-        linkedLinearIssue || linkedJiraIssue || linkedGithubIssue || preparedPrompt || autoApprove
+        linkedLinearIssue || linkedJiraIssue || linkedGithubIssue || linkedTicketIssue || preparedPrompt || autoApprove
           ? {
               linearIssue: linkedLinearIssue ?? null,
               jiraIssue: linkedJiraIssue ?? null,
               githubIssue: linkedGithubIssue ?? null,
+              ticketIssue: linkedTicketIssue ?? null,
               initialPrompt: preparedPrompt ?? null,
               autoApprove: autoApprove ?? null,
             }

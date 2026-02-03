@@ -812,6 +812,29 @@ declare global {
         searchTerm: string,
         limit?: number
       ) => Promise<{ success: boolean; issues?: any[]; error?: string }>;
+      // Local ticket CLI integration
+      ticketCheckConnection?: () => Promise<{
+        connected: boolean;
+        error?: string;
+      }>;
+      ticketInitialFetch?: (limit?: number) => Promise<{
+        success: boolean;
+        issues?: import('./ticket').TicketIssueSummary[];
+        error?: string;
+      }>;
+      ticketSearchIssues?: (
+        searchTerm: string,
+        limit?: number
+      ) => Promise<{
+        success: boolean;
+        issues?: import('./ticket').TicketIssueSummary[];
+        error?: string;
+      }>;
+      ticketGetDetails?: (id: string) => Promise<{
+        success: boolean;
+        issue?: import('./ticket').TicketIssueSummary;
+        error?: string;
+      }>;
       getProviderStatuses?: (opts?: {
         refresh?: boolean;
         providers?: string[];
@@ -1291,6 +1314,30 @@ export interface ElectronAPI {
   ) => Promise<{
     success: boolean;
     issues?: any[];
+    error?: string;
+  }>;
+
+  // Local ticket CLI integration
+  ticketCheckConnection?: () => Promise<{
+    connected: boolean;
+    error?: string;
+  }>;
+  ticketInitialFetch?: (limit?: number) => Promise<{
+    success: boolean;
+    issues?: import('./ticket').TicketIssueSummary[];
+    error?: string;
+  }>;
+  ticketSearchIssues?: (
+    searchTerm: string,
+    limit?: number
+  ) => Promise<{
+    success: boolean;
+    issues?: import('./ticket').TicketIssueSummary[];
+    error?: string;
+  }>;
+  ticketGetDetails?: (id: string) => Promise<{
+    success: boolean;
+    issue?: import('./ticket').TicketIssueSummary;
     error?: string;
   }>;
 
