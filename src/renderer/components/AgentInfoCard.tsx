@@ -113,6 +113,11 @@ export const agentInfo: Record<UiAgent, AgentInfo> = {
     description:
       'Mistral AI command-line coding assistant powered by Devstral. Provides conversational interface to your codebase with file manipulation, code search, version control, and execution tools.',
   },
+  programmator: {
+    title: 'Programmator',
+    description:
+      'Ticket-driven coding agent that works with local ticket files. Uses Claude under the hood to implement tasks phase by phase.',
+  },
 };
 
 type Props = {

@@ -50,4 +50,5 @@ export const agentConfig: Record<Agent, AgentInfo> = {
   copilot: { name: 'Copilot', logo: copilotLogo, alt: 'GitHub Copilot CLI', invertInDark: true },
   charm: { name: 'Charm', logo: charmLogo, alt: 'Charm Crush', invertInDark: true },
   rovo: { name: 'Rovo Dev', logo: atlassianLogo, alt: 'Rovo Dev' },
+  programmator: { name: 'Programmator', logo: claudeLogo, alt: 'Programmator CLI' },
 };

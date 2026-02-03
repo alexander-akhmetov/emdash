@@ -54,6 +54,7 @@ import { type GitHubIssueLink } from './types/chat';
 import { type JiraIssueSummary } from './types/jira';
 import { type LinearIssueSummary } from './types/linear';
 import { type TicketIssueSummary } from './types/ticket';
+import { getProvider, type ProviderId } from '@shared/providers/registry';
 
 const TERMINAL_PROVIDER_IDS = [
   'qwen',
@@ -1242,10 +1243,18 @@ const AppContent: React.FC = () => {
   ) => {
     if (!selectedProject) return;
     try {
+      // Check if primary agent's provider wants ticket ID only (e.g., programmator)
+      const primaryAgent = agentRuns[0]?.agent || 'claude';
+      const providerDef = getProvider(primaryAgent as ProviderId);
+
       // Build basic prompt without enrichment (enrichment happens in background later)
       // This makes task creation instant - user sees the task immediately
       let preparedPrompt: string | undefined = undefined;
-      if (initialPrompt && initialPrompt.trim()) {
+
+      // When useTicketIdOnly is true, pass just the ticket ID instead of full context
+      if (linkedTicketIssue && providerDef?.useTicketIdOnly) {
+        preparedPrompt = linkedTicketIssue.id;
+      } else if (initialPrompt && initialPrompt.trim()) {
         const parts: string[] = [];
         // Add basic issue info without API enrichment
         if (linkedLinearIssue) {
@@ -1271,7 +1280,12 @@ const AppContent: React.FC = () => {
         preparedPrompt = parts.join('\n');
       }
       const taskMetadata: TaskMetadata | null =
-        linkedLinearIssue || linkedJiraIssue || linkedGithubIssue || linkedTicketIssue || preparedPrompt || autoApprove
+        linkedLinearIssue ||
+        linkedJiraIssue ||
+        linkedGithubIssue ||
+        linkedTicketIssue ||
+        preparedPrompt ||
+        autoApprove
           ? {
               linearIssue: linkedLinearIssue ?? null,
               jiraIssue: linkedJiraIssue ?? null,
@@ -1285,7 +1299,6 @@ const AppContent: React.FC = () => {
       // Calculate total runs and determine if multi-agent
       const totalRuns = agentRuns.reduce((sum, ar) => sum + ar.runs, 0);
       const isMultiAgent = totalRuns > 1;
-      const primaryAgent = agentRuns[0]?.agent || 'claude';
 
       let newTask: Task;
       if (isMultiAgent) {

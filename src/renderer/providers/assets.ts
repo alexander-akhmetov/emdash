@@ -43,4 +43,5 @@ export const agentAssets: Record<UiAgent, AgentAsset> = {
   continue: { name: 'Continue', logo: continueLogo, alt: 'Continue CLI' },
   codebuff: { name: 'Codebuff', logo: codebuffLogo, alt: 'Codebuff CLI' },
   mistral: { name: 'Mistral AI', logo: mistralLogo, alt: 'Mistral Vibe CLI' },
+  programmator: { name: 'Programmator', logo: claudeLogo, alt: 'Programmator CLI' },
 };

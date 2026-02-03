@@ -37,11 +37,7 @@ const TicketIssueSelector: React.FC<Props> = ({
 
   const canList = typeof window !== 'undefined' && !!window.electronAPI?.ticketInitialFetch;
   const [isConnected, setIsConnected] = useState<boolean | null>(null);
-  const isDisabled =
-    disabled ||
-    isConnected !== true ||
-    isLoadingIssues ||
-    !!issueListError;
+  const isDisabled = disabled || isConnected !== true || isLoadingIssues || !!issueListError;
 
   useEffect(() => () => void (isMountedRef.current = false), []);
 

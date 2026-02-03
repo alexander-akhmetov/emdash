@@ -666,7 +666,10 @@ describe('ticketIpc handlers', () => {
   describe('ticket:searchIssues', () => {
     it('returns matching issues', async () => {
       const handler = await getIpcHandler('ticket:searchIssues');
-      const result = (await handler?.({}, 'emdash', 20)) as { success: boolean; issues?: unknown[] };
+      const result = (await handler?.({}, 'emdash', 20)) as {
+        success: boolean;
+        issues?: unknown[];
+      };
 
       expect(result.success).toBe(true);
       expect(result.issues?.length).toBeGreaterThan(0);
@@ -751,7 +754,10 @@ describe('ticketIpc handlers', () => {
 
     it('returns error for non-existent ticket', async () => {
       const handler = await getIpcHandler('ticket:getDetails');
-      const result = (await handler?.({}, 'nonexistent-id')) as { success: boolean; error?: string };
+      const result = (await handler?.({}, 'nonexistent-id')) as {
+        success: boolean;
+        error?: string;
+      };
 
       expect(result.success).toBe(false);
       expect(result.error).toBe('Ticket nonexistent-id not found.');

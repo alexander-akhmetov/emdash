@@ -19,6 +19,7 @@ export const PROVIDER_IDS = [
   'continue',
   'codebuff',
   'mistral',
+  'programmator',
 ] as const;
 
 export type ProviderId = (typeof PROVIDER_IDS)[number];
@@ -40,6 +41,8 @@ export type ProviderDefinition = {
   autoStartCommand?: string;
   icon?: string;
   terminalOnly?: boolean;
+  /** When true, only pass the ticket ID (not full context) when starting with a linked ticket */
+  useTicketIdOnly?: boolean;
 };
 
 export const PROVIDERS: ProviderDefinition[] = [
@@ -298,6 +301,18 @@ export const PROVIDERS: ProviderDefinition[] = [
     autoApproveFlag: '--auto-approve',
     initialPromptFlag: '--prompt',
     icon: 'mistral.png',
+    terminalOnly: true,
+  },
+  {
+    id: 'programmator',
+    name: 'Programmator',
+    commands: ['programmator'],
+    versionArgs: ['--version'],
+    cli: 'programmator',
+    defaultArgs: ['start'],
+    autoApproveFlag: '--dangerously-skip-permissions',
+    initialPromptFlag: '',
+    useTicketIdOnly: true,
     terminalOnly: true,
   },
 ];

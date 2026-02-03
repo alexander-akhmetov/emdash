@@ -64,6 +64,7 @@ const agentConfig: Record<Agent, { name: string; logo: string }> = {
   continue: { name: 'Continue', logo: continueLogo },
   codebuff: { name: 'Codebuff', logo: codebuffLogo },
   mistral: { name: 'Mistral Vibe', logo: mistralLogo },
+  programmator: { name: 'Programmator', logo: claudeLogo },
 };
 
 export const AgentDisplay: React.FC<Props> = ({
